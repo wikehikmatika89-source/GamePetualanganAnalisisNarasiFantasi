@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Petualangan Mario - Kuis Teks Narasi Fantasi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Press Start 2P & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #1a202c;
+            color: #2d3748;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+        }
+        .nes-btn {
+            position: relative;
+            display: inline-block;
+            padding: 10px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: white;
+            text-shadow: 2px 2px #000;
+            text-align: center;
+            border: 3px solid #000;
+            box-shadow: inset -3px -3px 0px 0px rgba(0,0,0,0.4), 3px 3px 0px 0px #000;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .nes-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: inset 1px 1px 0px 0px rgba(0,0,0,0.4), 1px 1px 0px 0px #000;
+        }
+        .nes-btn-green { background-color: #00a800; }
+        .nes-btn-red { background-color: #e52521; }
+        .nes-btn-yellow { background-color: #f8b800; color: #000; text-shadow: none; }
+        .nes-btn-blue { background-color: #0058f8; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #edf2f7; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between items-center p-2 sm:p-4 overflow-x-hidden">
+
+    <header class="w-full max-w-4xl bg-slate-900 border-4 border-black rounded-xl p-3 mb-2 flex flex-wrap justify-between items-center text-white shadow-2xl">
+        <div class="flex items-center space-x-2">
+            <span class="pixel-font text-xl text-red-500 animate-bounce">MARIO</span>
+            <span class="pixel-font text-xs text-yellow-400">KELAS 7</span>
+        </div>
+        <div class="flex items-center space-x-4 sm:space-x-8 text-xs sm:text-sm pixel-font mt-2 sm:mt-0">
+            <div>
+                <span class="text-gray-400 block text-[10px]">PEMAIN</span>
+                <span id="hud-name" class="text-white">---</span>
+            </div>
+            <div>
+                <span class="text-gray-400 block text-[10px]">NYAWA</span>
+                <span id="hud-lives" class="text-red-400 text-base">❤️❤️❤️❤️❤️</span>
+            </div>
+            <div>
+                <span class="text-gray-400 block text-[10px]">SKOR</span>
+                <span id="hud-score" class="text-yellow-300">0000</span>
+            </div>
+            <div>
+                <span class="text-gray-400 block text-[10px]">BUNGA</span>
+                <span id="hud-progress" class="text-green-400">0/30</span>
+            </div>
+        </div>
+        <button id="btn-sound" onclick="toggleAudio()" class="mt-2 sm:mt-0 p-2 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-600 text-xs flex items-center gap-1">
+            <span id="sound-icon">🔊</span>
+            <span id="sound-text">Musik ON</span>
+        </button>
+    </header>
+
+    <main class="w-full max-w-4xl flex-1 flex flex-col items-center justify-center relative">
+
+        <div id="screen-start" class="w-full bg-slate-800 border-4 border-black rounded-2xl p-6 sm:p-8 text-white text-center shadow-2xl relative z-20">
+            <div class="inline-block bg-red-600 border-2 border-white px-4 py-1 rounded-full pixel-font text-xs mb-4 text-white uppercase tracking-widest">
+                Media Pembelajaran Bahasa Indonesia
+            </div>
+            <h1 class="pixel-font text-2xl sm:text-4xl text-yellow-400 mb-3 leading-tight drop-shadow-md">
+                PETUALANGAN MARIO
+            </h1>
+            <p class="text-slate-300 mb-6 text-sm sm:text-base max-w-xl mx-auto">
+                Bantu Mario melewati rintangan! Sentuh <span class="text-red-400 font-bold">Jamur Super 🍄</span> untuk membesar & menembak bola api 🔥, hindari kuman pelan, dan jawab <span class="text-yellow-300 font-bold">30 Soal Bunga Matahari 🌻</span>!
+            </p>
+
+            <form id="form-identity" onsubmit="startGame(event)" class="max-w-md mx-auto bg-slate-900 p-6 rounded-xl border-2 border-slate-700 text-left space-y-4 shadow-inner">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-yellow-400 mb-1">Nama Lengkap Siswa</label>
+                    <input type="text" id="input-name" required placeholder="Contoh: Mario Bros" class="w-full px-4 py-2 bg-slate-800 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-yellow-400 text-white placeholder-slate-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-yellow-400 mb-1">Nomor Absen</label>
+                        <input type="number" id="input-absen" min="1" max="50" required placeholder="12" class="w-full px-4 py-2 bg-slate-800 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-yellow-400 text-white placeholder-slate-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-yellow-400 mb-1">Kelas</label>
+                        <select id="input-kelas" required class="w-full px-4 py-2 bg-slate-800 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-yellow-400 text-white">
+                            <option value="7-A">7 - A</option>
+                            <option value="7-B">7 - B</option>
+                            <option value="7-C">7 - C</option>
+                            <option value="7-D">7 - D</option>
+                            <option value="7-E">7 - E</option>
+                            <option value="7-F">7 - F</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-3">
+                    <button type="submit" class="w-full nes-btn nes-btn-green py-3 text-sm rounded-lg hover:scale-105 transition-transform">
+                        MULAI PETUALANGAN! 🚀
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 text-xs text-slate-400 flex flex-col gap-1 items-center">
+                <span>🎮 <b>Keyboard:</b> Panah Kiri/Kanan (Jalan), Panah Atas/Spasi (Lompat), Panah Bawah (Menunduk)</span>
+                <span class="text-yellow-300 font-bold">🔥 <b>Tembak Bola Api:</b> Tekan X / SHIFT / SPASI / Tombol 🔥 di Layar</span>
+            </div>
+        </div>
+
+        <div id="screen-game" class="w-full relative hidden">
+            <div class="relative w-full overflow-hidden border-4 border-black rounded-2xl bg-sky-300 shadow-2xl">
+                <canvas id="gameCanvas" class="w-full h-[360px] sm:h-[420px] block"></canvas>
+
+                <!-- On-Screen Action Controls -->
+                <div class="absolute top-2 right-2 z-10 flex gap-2">
+                    <button id="btn-desktop-shoot" onclick="manualShootTrigger()" class="bg-red-600 hover:bg-red-500 text-white border-2 border-black px-3 py-1.5 rounded-lg text-xs pixel-font shadow-lg active:scale-95 transition-transform flex items-center gap-1">
+                        🔥 TEMBAK (X)
+                    </button>
+                </div>
+
+                <!-- On-Screen Touch Controls (Mobile Friendly) -->
+                <div class="sm:hidden absolute bottom-2 left-2 right-2 flex justify-between items-center pointer-events-none z-10">
+                    <div class="flex gap-2 pointer-events-auto">
+                        <button id="btn-left" class="w-12 h-12 bg-slate-900/80 text-white border-2 border-white rounded-full font-bold text-xl active:bg-yellow-500">◀</button>
+                        <button id="btn-right" class="w-12 h-12 bg-slate-900/80 text-white border-2 border-white rounded-full font-bold text-xl active:bg-yellow-500">▶</button>
+                    </div>
+                    <div class="flex gap-2 pointer-events-auto">
+                        <button id="btn-down" class="w-11 h-11 bg-slate-900/80 text-white border-2 border-white rounded-full font-bold text-sm active:bg-yellow-500">▼</button>
+                        <button id="btn-shoot" class="w-12 h-12 bg-red-600 text-white border-2 border-white rounded-full font-bold text-base active:bg-red-400 animate-pulse">🔥</button>
+                        <button id="btn-jump" class="w-12 h-12 bg-green-600 text-white border-2 border-white rounded-full font-bold text-xs active:bg-green-400">LOMPAT</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-2 text-center text-xs text-slate-300 font-semibold flex justify-center items-center gap-4">
+                <span>🍄 Ambil Jamur untuk membesar & mengaktifkan Bola Api!</span>
+                <span>🔥 Tekan <b>X / SHIFT / SPASI</b> untuk Menembak!</span>
+            </div>
+        </div>
+
+        <div id="modal-quiz" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 hidden">
+            <div class="bg-white border-4 border-black rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+                <div class="bg-blue-600 border-b-4 border-black p-3 sm:p-4 text-white flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <span class="pixel-font text-xs sm:text-sm bg-yellow-400 text-black px-2 py-1 rounded border border-black" id="quiz-num-badge">SOAL 01/30</span>
+                        <span class="text-xs sm:text-sm font-bold tracking-wide">Teks Narasi Fantasi</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-full border-2 border-yellow-400">
+                        <span class="text-yellow-400 text-xs">⏱️ WAKTU:</span>
+                        <span id="quiz-timer" class="pixel-font text-sm text-red-400">60</span>
+                        <span class="text-xs text-gray-400">Detik</span>
+                    </div>
+                </div>
+
+                <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4 bg-slate-50">
+                    <div class="bg-amber-50 border-2 border-amber-300 rounded-xl p-4 text-slate-800 shadow-sm">
+                        <div class="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">📖 Kutipan Teks Narasi Fantasi:</div>
+                        <p id="quiz-narrative" class="text-xs sm:text-sm leading-relaxed italic font-serif text-slate-700 bg-white p-3 rounded-lg border border-amber-200">
+                            Loading Teks...
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 id="quiz-question" class="font-bold text-slate-900 text-sm sm:text-base leading-snug">
+                            Loading Pertanyaan...
+                        </h3>
+                    </div>
+
+                    <div id="quiz-options" class="grid grid-cols-1 gap-2.5 pt-1"></div>
+
+                    <div id="quiz-explanation" class="hidden bg-blue-50 border-2 border-blue-300 rounded-xl p-4 text-xs sm:text-sm text-slate-800">
+                        <div class="font-bold text-blue-900 mb-1">💡 Pembahasan:</div>
+                        <p id="explanation-text" class="text-slate-700 leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-100 border-t-2 border-slate-300 p-3 sm:p-4 flex justify-between items-center">
+                    <span class="text-xs text-slate-500 font-semibold">*Pilih 1 jawaban terbaik! Kesempatan 1x.</span>
+                    <button id="btn-next-quiz" onclick="closeQuizAndContinue()" disabled class="nes-btn nes-btn-green text-xs rounded-lg opacity-50 cursor-not-allowed">
+                        LANJUTKAN ➔
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-report" class="w-full bg-white border-4 border-black rounded-2xl p-6 sm:p-8 text-slate-900 shadow-2xl hidden">
+            <div class="text-center border-b-4 border-slate-900 pb-6 mb-6">
+                <span id="report-status-badge" class="pixel-font text-xs bg-red-600 text-white px-3 py-1 rounded-full uppercase">GAME OVER</span>
+                <h2 id="report-main-title" class="pixel-font text-2xl sm:text-3xl text-red-600 mt-2">MARIO KEHABISAN NYAWA</h2>
+                <p class="text-xs sm:text-sm text-slate-600 mt-1">Laporan Hasil Evaluasi Teks Narasi Fantasi Kelas 7</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-100 p-4 rounded-xl border-2 border-slate-300 mb-6 text-xs sm:text-sm">
+                <div><span class="text-slate-500 block">Nama Siswa:</span><b id="report-name" class="text-base text-slate-800">---</b></div>
+                <div><span class="text-slate-500 block">Nomor Absen:</span><b id="report-absen" class="text-base text-slate-800">---</b></div>
+                <div><span class="text-slate-500 block">Kelas:</span><b id="report-kelas" class="text-base text-slate-800">---</b></div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 text-center">
+                <div class="bg-blue-50 border-2 border-blue-200 p-3 rounded-xl">
+                    <span class="text-xs text-blue-600 font-bold block">TOTAL SKOR</span>
+                    <span id="report-score" class="pixel-font text-2xl text-blue-700">0</span>
+                    <span class="text-[10px] text-slate-500">Maksimal 120</span>
+                </div>
+                <div class="bg-green-50 border-2 border-green-200 p-3 rounded-xl">
+                    <span class="text-xs text-green-600 font-bold block">BENAR</span>
+                    <span id="report-correct" class="pixel-font text-2xl text-green-700">0</span>
+                    <span class="text-[10px] text-slate-500">Soal (+4 Poin)</span>
+                </div>
+                <div class="bg-red-50 border-2 border-red-200 p-3 rounded-xl">
+                    <span class="text-xs text-red-600 font-bold block">SALAH</span>
+                    <span id="report-wrong" class="pixel-font text-2xl text-red-700">0</span>
+                    <span class="text-[10px] text-slate-500">Soal (0 Poin)</span>
+                </div>
+                <div class="bg-gray-50 border-2 border-gray-200 p-3 rounded-xl">
+                    <span class="text-xs text-gray-600 font-bold block">BELUM DIJAWAB</span>
+                    <span id="report-unanswered" class="pixel-font text-2xl text-gray-700">30</span>
+                    <span class="text-[10px] text-slate-500">Dari 30 Soal</span>
+                </div>
+            </div>
+
+            <div id="report-motivation-box" class="bg-amber-50 border-2 border-amber-300 p-4 rounded-xl mb-6 text-xs sm:text-sm text-slate-800 space-y-1">
+                <div class="font-bold text-amber-800 flex items-center gap-1">
+                    <span id="motivation-icon">💬</span> <span id="motivation-title">Catatan Guru:</span>
+                </div>
+                <p id="motivation-text" class="leading-relaxed text-slate-700">
+                    Tetap semangat! Gunakan tembakan bola api untuk menghancurkan kuman dari jarak jauh!
+                </p>
+            </div>
+
+            <div class="bg-slate-100 border-2 border-slate-300 p-3 rounded-xl mb-6 text-xs text-slate-700 flex flex-wrap justify-between gap-2">
+                <span>🍄 Status Kekuatan: <b id="power-status-text" class="text-slate-800">Super Mario (Tembak Bola Api 🔥)</b></span>
+                <span>🌻 Bunga Matahari Selesai: <b id="flower-status-text" class="text-green-700">0/30</b></span>
+                <span>❤️ Sisa Nyawa: <b id="lives-status-text" class="text-red-600">0/5</b></span>
+            </div>
+
+            <div class="flex flex-wrap gap-4 justify-center pt-2">
+                <button onclick="window.print()" class="nes-btn nes-btn-blue text-xs rounded-lg flex items-center gap-2">
+                    🖨️ CETAK / SIMPAN LAPORAN
+                </button>
+                <button onclick="resetGame()" class="nes-btn nes-btn-green text-xs rounded-lg flex items-center gap-2">
+                    🎮 MAIN LAGI FROM AWAL
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="mt-4 text-center text-xs text-slate-500">
+        Petualangan Mario &copy; Media Pembelajaran Interaktif Bahasa Indonesia Kelas 7 SMP
+    </footer>
+
+    <script>
+        const QUESTION_BANK = [
+            { id: 1, narrative: "Di sebuah desa tersembunyi bernama Eldoria, hidup seorang anak bernama Arka. Suatu hari, ia menemukan cermin ajaib di ruang bawah tanah rumah neneknya. Ketika disentuh, cermin itu memancarkan cahaya biru dan menyedot Arka masuk ke dunia penuh naga bernapas es.", question: "Bagian struktur teks narasi fantasi di atas merupakan bagian...", options: ["Orientasi", "Komplikasi", "Resolusi", "Koda"], answer: 0, explanation: "Orientasi berisi pengenalan tokoh (Arka), latar tempat (Eldoria), dan awal mula peristiwa fantastis ditemukannya cermin ajaib." },
+            { id: 2, narrative: "Tiba-tiba, Sang Raja Kegelapan menghentakkan tongkatnya. Tanah bergetar hebat, dan serbuan monster serigala hitam bermata merah mulai mengepung benteng terakhir Kerajaan Silvana. Putri Candra menggenggam pedang cahayanya dengan gemetar.", question: "Bagian struktur teks di atas dinamakan...", options: ["Orientasi", "Komplikasi", "Resolusi", "Reorientasi"], answer: 1, explanation: "Komplikasi ditandai dengan timbulnya konflik atau masalah utama, yaitu serangan Raja Kegelapan dan serigala hitam." },
+            { id: 3, narrative: "Dengan sisa tenaganya, Arya menancapkan Kristal Pelangi ke dada Monster Batu. Seketika itu juga, kutukan sirna dan seluruh warga kota kembali menjadi manusia. Kedamaian pun tercipta kembali di Negeri Awan.", question: "Kutipan cerita di atas termasuk dalam bagian struktur...", options: ["Orientasi", "Komplikasi", "Resolusi", "Abstraksi"], answer: 2, explanation: "Resolusi berisi penyelesaian masalah/konflik cerita, ditandai dengan sirnanya kutukan dan kembalinya kedamaian." },
+            { id: 4, narrative: "Kancil Ajaib itu dapat berbicara bahasa manusia, mampu menghilang dalam sekejap mata, dan memiliki sayap bening mirip kupu-kupu yang bersinar keemasan.", question: "Ciri khas teks fantasi yang menonjol pada kalimat di atas adalah...", options: ["Latar di dunia nyata", "Keajaiban/keanehan tokoh", "Penggunaan bahasa formal", "Alur cerita yang monoton"], answer: 1, explanation: "Ciri utama teks fantasi adalah adanya keajaiban, keanehan, atau keunggulan supranatural pada tokoh atau latar." },
+            { id: 5, narrative: "Kisah petualangan seorang remaja bernama Elian yang secara tak sengaja masuk ke portal masa depan pada tahun 3025 dan bertarung melawan tentara robot.", question: "Berdasarkan kesesuaiannya dengan dunia nyata dan alur waktunya, cerita di atas termasuk jenis fantasi...", options: ["Fantasi Sezaman", "Fantasi Irisan", "Fantasi Lintas Waktu", "Fantasi Total"], answer: 2, explanation: "Fantasi Lintas Waktu menggunakan dua periode waktu yang berbeda (masa kini menembus ke tahun 3025)." },
+            { id: 6, narrative: "Seluruh nama tokoh, tempat kejadian, dan peristiwa dalam cerita 'Dunia Unicorn Negeri Pelangi' sepenuhnya tidak ada di dunia nyata.", question: "Berdasarkan latar dan dunianya, cerita tersebut tergolong jenis fantasi...", options: ["Fantasi Total", "Fantasi Irisan", "Fantasi Sezaman", "Fantasi Nyata"], answer: 0, explanation: "Fantasi Total terjadi jika seluruh unsur (tokoh, latar, kejadian) merupakan rekaan murni dan tidak ada di dunia nyata." },
+            { id: 7, narrative: "Cerita fantasi yang menggunakan latar kehidupan sehari-hari di sekolah namun tiba-tiba pulpen salah satu murid memiliki kekuatan sihir disebut fantasi...", question: "Jenis fantasi yang mencampurkan dunia nyata dan dunia imajinasi adalah...", options: ["Fantasi Total", "Fantasi Irisan", "Fantasi Sejarah", "Fantasi Absurd"], answer: 1, explanation: "Fantasi Irisan menggunakan gabungan antara dunia nyata dan unsur fantasi/imajinasi." },
+            { id: 8, narrative: "Gober mengepakkan sayap naga merahnya lalu melesat tinggi menembus awan tebal.", question: "Kata 'Gober' dan 'sayap naga merahnya' pada kalimat di atas menggunakan kaidah kebahasaan...", options: ["Kata ganti dan nama diri", "Konjungsi urutan waktu", "Kata kerja pasif", "Kalimat tidak langsung"], answer: 0, explanation: "Kaidah kebahasaan teks fantasi menggunakan kata ganti dan nama diri sebagai sudut pandang penceritaan." },
+            { id: 9, narrative: "Aroma manis bunga elf menyeruak lembut, diselingi gemericik air sungai emas bergelombang halus yang memantulkan sinar rembulan kemerahan.", question: "Penggalan teks di atas memanfaatkan pancaindra untuk menggambarkan latar. Indra yang paling dominan adalah...", options: ["Penglihatan dan Penciuman", "Pendengaran dan Perabaan", "Pencecap dan Penglihatan", "Penciuman dan Perabaan"], answer: 0, explanation: "Aroma menyeruak (penciuman) dan sungai emas bergelombang memantulkan sinar (penglihatan)." },
+            { id: 10, narrative: "Setelah mantra dibacakan, seketika itu juga tubuh Danu berubah menjadi kecil setinggi ibu jari.", question: "Kata 'Setelah' dan 'seketika itu juga' merupakan kaidah kebahasaan berupa...", options: ["Kata sifat", "Konjungsi urutan waktu", "Kata sapaan", "Kalimat perintah"], answer: 1, explanation: "Konjungsi urutan waktu (penanda temporal) digunakan untuk menandai keterkaitan antarevent cerita." },
+            { id: 11, narrative: "'Jangan sentuh kristal hijau itu, nanti monster penjaga akan terbangun!' teriak Milo kepada temannya.", question: "Kalimat di atas menggunakan kaidah kebahasaan...", options: ["Kalimat tidak langsung", "Kalimat langsung", "Kalimat tanya", "Kalimat pasif"], answer: 1, explanation: "Kalimat langsung ditandai dengan tanda petik ganda (\"...\") dan diujarkan langsung oleh tokoh." },
+            { id: 12, narrative: "Boni terkejut saat tongkat kayunya dapat mengeluarkan kilatan petir menyambar batu besar.", question: "Kata kerja yang menunjukkan aksi/tindakan fisik pada kalimat di atas adalah...", options: ["Terkejut", "Saat", "Mengeluarkan", "Batu"], answer: 2, explanation: "'Mengeluarkan' merupakan kata kerja tindakan (aksi) yang dilakukan oleh tongkat/tokoh." },
+            { id: 13, narrative: "Cerita fantasi umumnya menggunakan latar yang memiliki sifat khas, yaitu...", question: "Pernyataan yang tepat mengenai latar dalam cerita fantasi adalah...", options: ["Terikat oleh hukum alam nyata", "Dapat menerobos dimensi ruang dan waktu", "Harus bertempat di Indonesia", "Tidak memiliki suasana khusus"], answer: 1, explanation: "Latar cerita fantasi bebas dan dapat menerobos ruang maupun waktu (lintas dimensi)." },
+            { id: 14, narrative: "Dalam cerita fantasi 'Ksatria Awan', tokoh utamanya adalah seorang anak yatim piatu yang memiliki tato naga yang bisa hidup.", question: "Watak atau keunikan tokoh fantasi tersebut ditunjukkan oleh...", options: ["Statusnya sebagai anak yatim", "Tato naga yang bisa hidup", "Namanya yang keren", "Pakaian yang dipakai"], answer: 1, explanation: "Keunikan tokoh fantasi terlihat dari kesaktian atau hal ajaib yang dimilikinya (tato naga hidup)." },
+            { id: 15, narrative: "Berikut ini yang BUKAN merupakan ciri umum teks narasi fantasi adalah...", question: "Pilihlah salah satu poin yang tidak sesuai!", options: ["Ada keajaiban/kegaibkan", "Menggunakan fakta ilmiah murni tanpa imajinasi", "Tokoh memiliki kesaktian", "Berseifat fiktif/imajinatif"], answer: 1, explanation: "Teks fantasi bersifat imajinatif/fiktif, bukan tulisan fakta ilmiah murni." },
+            { id: 16, narrative: "Dahulu kala di planet Zargon, hidup makhluk-makhluk mungil bertelinga panjang yang memakan sinar matahari.", question: "Kutipan di atas menunjukkan struktur bagian...", options: ["Orientasi", "Komplikasi", "Resolusi", "Penutup"], answer: 0, explanation: "Awal cerita yang mengenalkan waktu (Dahulu kala), tempat (planet Zargon), dan tokoh adalah Orientasi." },
+            { id: 17, narrative: "Tiba-tiba bola kristal itu retak. Asam hitam pekat keluar dan merusak pemukiman para kurcaci.", question: "Kata 'Tiba-tiba' pada kalimat tersebut berfungsi untuk...", options: ["Menandai awal orientasi", "Menandai perubahan latar atau timbulnya konflik", "Menutup cerita", "Menjelaskan identitas tokoh"], answer: 1, explanation: "Kata 'tiba-tiba' sering digunakan untuk menandai munculnya konflik atau kejutan pada alur cerita." },
+            { id: 18, narrative: "Nira menggenggam batu sihirnya erat-erat, lalu berbisik, 'Keluarlah pelindung angin!'", question: "Kaidah kebahasaan berupa kata ganti orang pertama dalam kalimat tersebut ditunjukkan oleh...", options: ["Nira", "Batu sihirnya", "Keluarlah", "Tidak ada (menggunakan nama orang/orang ketiga)"], answer: 3, explanation: "'Nira' adalah nama diri yang bertindak sebagai kata ganti orang ketiga." },
+            { id: 19, narrative: "Kisah yang menceritakan petualangan tokoh di dunia masa kini (tahun 2026) dan dunia fantasi secara bergantian dinamakan...", question: "Jenis latar waktu cerita fantasi tersebut tergolong...", options: ["Fantasi Sezaman", "Fantasi Lintas Waktu", "Fantasi Masa Lalu", "Fantasi Masa Depan"], answer: 1, explanation: "Menceritakan dua masa atau dua ruang waktu berbeda dinamakan Fantasi Lintas Waktu." },
+            { id: 20, narrative: "Akhirnya, ratu memberikan tongkat sihirnya kepada Alva sebagai hadiah atas keberaniannya menyelamatkan kerajaan.", question: "Kata 'Akhirnya' pada teks di atas biasa digunakan pada struktur...", options: ["Orientasi", "Komplikasi", "Resolusi", "Judul"], answer: 2, explanation: "Kata 'Akhirnya' mengindikasikan penyelesaian masalah pada bagian Resolusi." },
+            { id: 21, narrative: "Hutan itu terasa sangat dingin. Dedaunan biru keemasan bersinar lembut menembus kabut tipis.", question: "Penggunaan kata sifat (adjektiva) pada teks di atas adalah...", options: ["Hutan, dedaunan, kabut", "Sangat dingin, biru keemasan, lembut, tipis", "Terasa, bersinar, menembus", "Itu, pada, ke"], answer: 1, explanation: "'Dingin', 'biru keemasan', 'lembut', dan 'tipis' adalah kata sifat untuk menggambarkan suasana dan objek." },
+            { id: 22, narrative: "Manakah di antara judul berikut yang paling mencerminkan teks narasi fantasi?", question: "Pilih judul yang bergenre fantasi!", options: ["Cara Membuat Nasi Goreng Spesial", "Petualangan Rahasia di Kerajaan Bintang", "Laporan Hasil Observasi Hutan Mangrove", "Biografi Ir. Soekarno"], answer: 1, explanation: "'Petualangan Rahasia di Kerajaan Bintang' mengindikasikan cerita imajinatif/fantasi." },
+            { id: 23, narrative: "Penyelesaian konflik dalam teks narasi fantasi dapat dilakukan dengan cara...", question: "Resolusi dalam narasi fantasi biasanya dicapai melalui...", options: ["Tindakan ajaib atau perjuangan tokoh", "Pengenalan tokoh baru", "Mengulang kembali konflik dari awal", "Menghapus seluruh latar tempat"], answer: 0, explanation: "Konflik fantasi diselesaikan lewat aksi, perjuangan, atau bantuan keajaiban yang dimiliki tokoh." },
+            { id: 24, narrative: "Sora melompat ke atas punggung burung phoenix emas, lalu terbang menembus awan pelangi.", question: "Kata kerja aksi dalam kalimat di atas adalah...", options: ["Melompat dan Terbang", "Sora dan Punggung", "Phoenix dan Awan", "Emas dan Pelangi"], answer: 0, explanation: "'Melompat' dan 'terbang' merupakan kata kerja aksi (tindakan fisik)." },
+            { id: 25, narrative: "Cerita fantasi yang alurnya berurutan dari pengenalan, muncul masalah, hingga penyelesaian masalah menggunakan alur...", question: "Jenis alur berurutan maju disebut...", options: ["Alur Maju", "Alur Mundur", "Alur Campuran", "Alur Acak"], answer: 0, explanation: "Alur maju menceritakan peristiwa secara kronologis berurutan dari awal sampai akhir." },
+            { id: 26, narrative: "Latar tempat berupa 'Gua Kristal Abadi yang melayang di atas Samudra Biru' merupakan contoh latar yang bersifat...", question: "Sifat latar dalam teks fantasi tersebut adalah...", options: ["Realistis dan nyata", "Imajinatif dan fantastis", "Berdasarkan sejarah ilmiah", "Sederhana"], answer: 1, explanation: "Gua melayang di atas samudra adalah wujud latar yang imajinatif dan tidak ada di dunia nyata." },
+            { id: 27, narrative: "Mengapa teks narasi fantasi sangat disukai oleh anak-anak dan remaja?", question: "Alasan utama keunggulan cerita fantasi adalah...", options: ["Bahasanya sangat rumit", "Mengembangkan daya imajinasi dan kreativitas tanpa batas", "Isinya hanya berupa fakta ilmiah", "Ceritanya sangat pendek"], answer: 1, explanation: "Teks fantasi merangsang imajinasi serta kreativitas pembaca melalui dunia rekaan yang unik." },
+            { id: 28, narrative: "Ibu Peri berkata bahwa kita harus menyatukan empat batu elemen sebelum bulan purnama tiba.", question: "Kalimat di atas jika diubah menjadi kaidah kalimat tidak langsung ditandai dengan...", options: ["Penggunaan tanda petik ganda", "Penggunaan kata bahwa dan tidak pakai tanda petik", "Penggunaan tanda tanya", "Penggunaan kata seru"], answer: 1, explanation: "Kalimat tidak langsung menceritakan kembali ucapan tokoh menggunakan konjungsi 'bahwa' tanpa tanda petik." },
+            { id: 29, narrative: "Struktur teks narasi fantasi secara berurutan yang benar adalah...", question: "Urutan struktur teks narasi fantasi yang tepat adalah...", options: ["Komplikasi - Orientasi - Resolusi", "Orientasi - Komplikasi - Resolusi", "Resolusi - Orientasi - Komplikasi", "Orientasi - Resolusi - Komplikasi"], answer: 1, explanation: "Struktur baku narasi fantasi dimulai dari Orientasi (Pengenalan) -> Komplikasi (Konflik) -> Resolusi (Penyelesaian)." },
+            { id: 30, narrative: "Selamat! Kamu telah mencapai Bunga Matahari ke-30! Mario berhasil mengumpulkan ilmu teks narasi fantasi untuk menyelamatkan Kerajaan Bahasa!", question: "Unsur utama yang paling penting saat menulis teks narasi fantasi buatan sendiri adalah...", options: ["Ide cerita yang imajinatif dan menarik", "Penulisan rumus matematika", "Jumlah halaman yang sangat tebal", "Penggunaan grafik statistik"], answer: 0, explanation: "Kunci utama karya narasi fantasi adalah ide cerita segar, unik, dan kaya akan daya imajinasi." }
+        ];
+
+        let playerIdentity = { name: '', absen: '', kelas: '7-A' };
+        let gameState = {
+            lives: 5,
+            score: 0,
+            flowersCollected: 0,
+            isBig: true, // Super Mario active
+            hasShootingPower: true, // Fireball shooting enabled
+            currentQuestionIdx: 0,
+            answers: [],
+            isPaused: false,
+            audioEnabled: true
+        };
+
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!gameState.audioEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'jump') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.15);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'flower') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.setValueAtTime(400, now + 0.08);
+                    osc.frequency.setValueAtTime(500, now + 0.16);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'mushroom') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.exponentialRampToValueAtTime(600, now + 0.25);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'shoot') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(700, now);
+                    osc.frequency.exponentialRampToValueAtTime(150, now + 0.12);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'correct') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.1);
+                    osc.frequency.setValueAtTime(783.99, now + 0.2);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.setValueAtTime(150, now + 0.15);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'hit') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(120, now);
+                    osc.frequency.exponentialRampToValueAtTime(40, now + 0.2);
+                    gain.gain.setValueAtTime(0.4, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                }
+            } catch (e) {
+                console.log("Audio play error:", e);
+            }
+        }
+
+        function toggleAudio() {
+            gameState.audioEnabled = !gameState.audioEnabled;
+            document.getElementById('sound-icon').innerText = gameState.audioEnabled ? '🔊' : '🔇';
+            document.getElementById('sound-text').innerText = gameState.audioEnabled ? 'Musik ON' : 'Musik OFF';
+        }
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = 800;
+            canvas.height = 400;
+        }
+        resizeCanvas();
+
+        const keys = { left: false, right: false, up: false, down: false, shoot: false };
+
+        window.addEventListener('keydown', (e) => {
+            initAudio();
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+                if (!keys.up && mario.grounded && !gameState.isPaused) {
+                    mario.vy = -mario.jumpPower;
+                    mario.grounded = false;
+                    playSound('jump');
+                }
+                keys.up = true;
+            }
+            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.down = true;
+
+            // Shooting controls: X, SHIFT, or SPACEBAR
+            if (e.key === 'x' || e.key === 'X' || e.key === 'Shift' || e.key === ' ') {
+                if (!keys.shoot && gameState.hasShootingPower && !gameState.isPaused) {
+                    shootFireball();
+                }
+                keys.shoot = true;
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.up = false;
+            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.down = false;
+            if (e.key === 'x' || e.key === 'X' || e.key === 'Shift' || e.key === ' ') keys.shoot = false;
+        });
+
+        function manualShootTrigger() {
+            initAudio();
+            if (gameState.hasShootingPower && !gameState.isPaused) {
+                shootFireball();
+            }
+        }
+
+        function setupTouchBtn(id, keyProp, action) {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            const start = (e) => {
+                e.preventDefault();
+                initAudio();
+                if (action) action();
+                else keys[keyProp] = true;
+            };
+            const end = (e) => {
+                e.preventDefault();
+                if (!action) keys[keyProp] = false;
+            };
+            btn.addEventListener('touchstart', start);
+            btn.addEventListener('touchend', end);
+            btn.addEventListener('mousedown', start);
+            btn.addEventListener('mouseup', end);
+        }
+
+        setupTouchBtn('btn-left', 'left');
+        setupTouchBtn('btn-right', 'right');
+        setupTouchBtn('btn-down', 'down');
+        setupTouchBtn('btn-jump', 'up', () => {
+            if (mario.grounded && !gameState.isPaused) {
+                mario.vy = -mario.jumpPower;
+                mario.grounded = false;
+                playSound('jump');
+            }
+        });
+        setupTouchBtn('btn-shoot', 'shoot', () => {
+            if (gameState.hasShootingPower && !gameState.isPaused) {
+                shootFireball();
+            }
+        });
+
+        const mario = {
+            x: 100,
+            y: 280,
+            width: 36,
+            height: 54,
+            vx: 0,
+            vy: 0,
+            speed: 4.2,
+            jumpPower: 12.5,
+            gravity: 0.6,
+            grounded: false,
+            crouching: false,
+            facing: 'right',
+            invulnerableTimer: 0,
+
+            reset() {
+                this.x = 100;
+                this.y = 280;
+                this.vx = 0;
+                this.vy = 0;
+                this.width = gameState.isBig ? 36 : 32;
+                this.height = gameState.isBig ? 54 : 40;
+                this.invulnerableTimer = 0;
+            }
+        };
+
+        let enemies = [];
+        let flowers = [];
+        let mushrooms = [];
+        let fireballs = [];
+        let cameraX = 0;
+
+        function initWorld() {
+            enemies = [];
+            flowers = [];
+            mushrooms = [];
+            fireballs = [];
+            cameraX = 0;
+
+            const startX = 600;
+            const gap = 450;
+
+            for (let i = 0; i < 30; i++) {
+                const flowerX = startX + (i * gap);
+                flowers.push({
+                    id: i,
+                    x: flowerX,
+                    y: 240,
+                    width: 32,
+                    height: 38,
+                    collected: false
+                });
+
+                // Spawn slow Kumans (Goombas)
+                if (i % 2 === 0) {
+                    enemies.push({
+                        x: flowerX + 220,
+                        y: 312,
+                        width: 32,
+                        height: 32,
+                        vx: -0.25,
+                        alive: true
+                    });
+                }
+
+                // Spawn Mushrooms
+                if (i % 3 === 1) {
+                    mushrooms.push({
+                        x: flowerX - 180,
+                        y: 250,
+                        width: 28,
+                        height: 28,
+                        vx: 0.4,
+                        collected: false
+                    });
+                }
+            }
+        }
+
+        function shootFireball() {
+            if (!gameState.hasShootingPower) return;
+            playSound('shoot');
+            fireballs.push({
+                x: mario.facing === 'right' ? mario.x + mario.width : mario.x - 12,
+                y: mario.y + mario.height / 2 - 6,
+                vx: mario.facing === 'right' ? 9 : -9,
+                vy: 2,
+                width: 14,
+                height: 14
+            });
+        }
+
+        function updateGame() {
+            if (gameState.isPaused) return;
+
+            if (mario.invulnerableTimer > 0) mario.invulnerableTimer--;
+
+            if (keys.down && mario.grounded) {
+                mario.crouching = true;
+                mario.height = gameState.isBig ? 32 : 24;
+            } else {
+                mario.crouching = false;
+                mario.height = gameState.isBig ? 54 : 40;
+            }
+
+            if (keys.left && !mario.crouching) {
+                mario.vx = -mario.speed;
+                mario.facing = 'left';
+            } else if (keys.right && !mario.crouching) {
+                mario.vx = mario.speed;
+                mario.facing = 'right';
+            } else {
+                mario.vx *= 0.7;
+            }
+
+            mario.vy += mario.gravity;
+            mario.x += mario.vx;
+            mario.y += mario.vy;
+
+            const groundY = 340 - mario.height;
+            if (mario.y >= groundY) {
+                mario.y = groundY;
+                mario.vy = 0;
+                mario.grounded = true;
+            }
+
+            if (mario.x < cameraX) mario.x = cameraX;
+            if (mario.x - cameraX > 300) cameraX = mario.x - 300;
+
+            // Fireball updates and bouncing physics
+            for (let i = fireballs.length - 1; i >= 0; i--) {
+                const fb = fireballs[i];
+                fb.x += fb.vx;
+                fb.y += fb.vy;
+
+                if (fb.y >= 328) {
+                    fb.y = 328;
+                    fb.vy = -3.5; // Bounce off the ground
+                }
+
+                if (fb.x < cameraX - 50 || fb.x > cameraX + 850) {
+                    fireballs.splice(i, 1);
+                    continue;
+                }
+
+                // Check collision between fireball and kuman
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    const enemy = enemies[j];
+                    if (enemy.alive && checkCollision(fb, enemy)) {
+                        enemy.alive = false;
+                        fireballs.splice(i, 1);
+                        playSound('hit');
+                        gameState.score += 10;
+                        updateHUD();
+                        break;
+                    }
+                }
+            }
+
+            // Enemies (Kumans) update
+            enemies.forEach(enemy => {
+                if (!enemy.alive) return;
+                enemy.x += enemy.vx;
+
+                if (mario.invulnerableTimer === 0 && checkCollision(mario, enemy)) {
+                    if (gameState.isBig) {
+                        gameState.isBig = false;
+                        gameState.hasShootingPower = false;
+                        mario.width = 32;
+                        mario.height = 40;
+                        mario.invulnerableTimer = 60;
+                        playSound('hit');
+                    } else {
+                        gameState.lives--;
+                        playSound('hit');
+                        updateHUD();
+
+                        if (gameState.lives <= 0) {
+                            gameOver();
+                        } else {
+                            mario.invulnerableTimer = 90;
+                            mario.x = Math.max(0, mario.x - 60);
+                        }
+                    }
+                }
+            });
+
+            // Mushroom Collection
+            mushrooms.forEach(m => {
+                if (m.collected) return;
+                if (checkCollision(mario, m)) {
+                    m.collected = true;
+                    gameState.isBig = true;
+                    gameState.hasShootingPower = true;
+                    mario.height = 54;
+                    mario.width = 36;
+                    playSound('mushroom');
+                    gameState.score += 20;
+                    updateHUD();
+                }
+            });
+
+            // Sunflower (Quiz Trigger)
+            flowers.forEach((flower, idx) => {
+                if (flower.collected) return;
+                if (checkCollision(mario, flower)) {
+                    flower.collected = true;
+                    playSound('flower');
+                    openQuizModal(idx);
+                }
+            });
+        }
+
+        function checkCollision(rect1, rect2) {
+            return (
+                rect1.x < rect2.x + rect2.width &&
+                rect1.x + rect1.width > rect2.x &&
+                rect1.y < rect2.y + rect2.height &&
+                rect1.y + rect1.height > rect2.y
+            );
+        }
+
+        function renderGame() {
+            ctx.fillStyle = '#5c94fc';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(-cameraX, 0);
+
+            // Sky Clouds
+            ctx.fillStyle = '#ffffff';
+            for (let i = 0; i < 40; i++) {
+                const cx = i * 250 + 50;
+                ctx.beginPath();
+                ctx.arc(cx, 80, 25, 0, Math.PI * 2);
+                ctx.arc(cx + 20, 70, 30, 0, Math.PI * 2);
+                ctx.arc(cx + 40, 80, 25, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Green Hills
+            ctx.fillStyle = '#00a800';
+            for (let i = 0; i < 30; i++) {
+                const hx = i * 400 + 80;
+                ctx.beginPath();
+                ctx.arc(hx, 340, 70, Math.PI, 0);
+                ctx.fill();
+            }
+
+            // Ground & Bricks
+            ctx.fillStyle = '#c84c0c';
+            ctx.fillRect(cameraX - 100, 340, canvas.width + 200, 60);
+            ctx.fillStyle = '#00a800';
+            ctx.fillRect(cameraX - 100, 340, canvas.width + 200, 8);
+
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            for (let bx = Math.floor(cameraX / 32) * 32 - 32; bx < cameraX + canvas.width + 32; bx += 32) {
+                ctx.strokeRect(bx, 348, 32, 26);
+            }
+
+            // Sunflowers
+            flowers.forEach((f, idx) => {
+                if (f.collected) return;
+                ctx.fillStyle = '#00a800';
+                ctx.fillRect(f.x + 14, f.y + 16, 4, 22);
+
+                ctx.fillStyle = (Math.floor(Date.now() / 200) % 2 === 0) ? '#f8b800' : '#e52521';
+                ctx.beginPath();
+                ctx.arc(f.x + 16, f.y + 12, 14, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(f.x + 16, f.y + 12, 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 10px "Press Start 2P"';
+                ctx.fillText('#' + (idx + 1), f.x + 2, f.y - 6);
+            });
+
+            // Mushrooms
+            mushrooms.forEach(m => {
+                if (m.collected) return;
+                ctx.fillStyle = '#e52521';
+                ctx.beginPath();
+                ctx.arc(m.x + 14, m.y + 12, 14, Math.PI, 0);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(m.x + 10, m.y + 4, 8, 6);
+
+                ctx.fillStyle = '#f8d8b0';
+                ctx.fillRect(m.x + 6, m.y + 12, 16, 14);
+            });
+
+            // Kumans (Goombas)
+            enemies.forEach(e => {
+                if (!e.alive) return;
+                ctx.fillStyle = '#a81010';
+                ctx.beginPath();
+                ctx.ellipse(e.x + 16, e.y + 16, 16, 14, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(e.x + 6, e.y + 10, 5, 8);
+                ctx.fillRect(e.x + 21, e.y + 10, 5, 8);
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(e.x + 8, e.y + 12, 3, 4);
+                ctx.fillRect(e.x + 21, e.y + 12, 3, 4);
+
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(e.x + 2, e.y + 26, 10, 6);
+                ctx.fillRect(e.x + 20, e.y + 26, 10, 6);
+            });
+
+            // Fireballs (Animated Fireballs)
+            fireballs.forEach(fb => {
+                ctx.fillStyle = '#f8b800';
+                ctx.beginPath();
+                ctx.arc(fb.x + 7, fb.y + 7, 7, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#e52521';
+                ctx.beginPath();
+                ctx.arc(fb.x + 7, fb.y + 7, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(fb.x + 5, fb.y + 5, 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Mario Sprite
+            if (mario.invulnerableTimer % 6 < 3) {
+                ctx.save();
+                ctx.translate(mario.x + mario.width / 2, mario.y + mario.height / 2);
+                if (mario.facing === 'left') ctx.scale(-1, 1);
+
+                const w = mario.width;
+                const h = mario.height;
+
+                const shirtColor = gameState.hasShootingPower ? '#ffffff' : '#e52521';
+                const overallColor = gameState.hasShootingPower ? '#e52521' : '#0058f8';
+
+                // Hat & Shirt
+                ctx.fillStyle = shirtColor;
+                ctx.fillRect(-w/2, -h/2, w, 12);
+                ctx.fillRect(-w/2 + 4, -h/2 - 4, w - 8, 6);
+
+                // Face
+                ctx.fillStyle = '#f8d8b0';
+                ctx.fillRect(-w/2 + 4, -h/2 + 8, w - 8, 14);
+
+                // Eyes & Mustache
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, -h/2 + 16, 12, 5);
+                ctx.fillRect(4, -h/2 + 10, 4, 5);
+
+                // Torso
+                ctx.fillStyle = shirtColor;
+                ctx.fillRect(-w/2 + 2, -h/2 + 20, w - 4, 12);
+
+                // Overalls
+                ctx.fillStyle = overallColor;
+                ctx.fillRect(-w/2 + 4, -h/2 + 26, w - 8, h - 30);
+
+                // Yellow Buttons
+                ctx.fillStyle = '#f8b800';
+                ctx.fillRect(-2, -h/2 + 28, 3, 3);
+
+                // Shoes
+                ctx.fillStyle = '#a81010';
+                ctx.fillRect(-w/2, h/2 - 6, 12, 6);
+                ctx.fillRect(2, h/2 - 6, 12, 6);
+
+                ctx.restore();
+            }
+
+            ctx.restore();
+        }
+
+        function gameLoop() {
+            updateGame();
+            renderGame();
+            requestAnimationFrame(gameLoop);
+        }
+
+        let quizTimerInterval = null;
+        let quizTimeLeft = 60;
+        let currentActiveFlowerIdx = 0;
+
+        function startGame(event) {
+            event.preventDefault();
+            initAudio();
+
+            playerIdentity.name = document.getElementById('input-name').value.trim();
+            playerIdentity.absen = document.getElementById('input-absen').value;
+            playerIdentity.kelas = document.getElementById('input-kelas').value;
+
+            document.getElementById('hud-name').innerText = playerIdentity.name.split(' ')[0].toUpperCase();
+
+            document.getElementById('screen-start').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+
+            initWorld();
+            mario.reset();
+            updateHUD();
+
+            gameState.isPaused = false;
+        }
+
+        function updateHUD() {
+            document.getElementById('hud-lives').innerText = '❤️'.repeat(Math.max(0, gameState.lives));
+            document.getElementById('hud-score').innerText = String(gameState.score).padStart(4, '0');
+            document.getElementById('hud-progress').innerText = `${gameState.flowersCollected}/30`;
+        }
+
+        function openQuizModal(flowerIdx) {
+            gameState.isPaused = true;
+            currentActiveFlowerIdx = flowerIdx;
+            const q = QUESTION_BANK[flowerIdx];
+
+            document.getElementById('quiz-num-badge').innerText = `SOAL ${String(flowerIdx + 1).padStart(2, '0')}/30`;
+            document.getElementById('quiz-narrative').innerText = `"${q.narrative}"`;
+            document.getElementById('quiz-question').innerText = `${flowerIdx + 1}. ${q.question}`;
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            const optionLabels = ['A', 'B', 'C', 'D'];
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-3.5 rounded-xl border-2 border-slate-300 bg-white hover:bg-slate-100 text-xs sm:text-sm font-semibold transition-all flex items-center gap-3 shadow-sm";
+                btn.onclick = () => selectAnswer(i, q.answer, q.explanation);
+                btn.innerHTML = `
+                    <span class="w-7 h-7 rounded-lg bg-slate-800 text-white flex items-center justify-center pixel-font text-xs flex-shrink-0">${optionLabels[i]}</span>
+                    <span>${opt}</span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('quiz-explanation').classList.add('hidden');
+            const nextBtn = document.getElementById('btn-next-quiz');
+            nextBtn.disabled = true;
+            nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            document.getElementById('modal-quiz').classList.remove('hidden');
+
+            quizTimeLeft = 60;
+            document.getElementById('quiz-timer').innerText = quizTimeLeft;
+
+            clearInterval(quizTimerInterval);
+            quizTimerInterval = setInterval(() => {
+                quizTimeLeft--;
+                document.getElementById('quiz-timer').innerText = quizTimeLeft;
+
+                if (quizTimeLeft <= 0) {
+                    clearInterval(quizTimerInterval);
+                    selectAnswer(-1, q.answer, "Waktu habis! Anda belum memilih jawaban.");
+                }
+            }, 1000);
+        }
+
+        function selectAnswer(selectedIndex, correctIndex, explanationText) {
+            clearInterval(quizTimerInterval);
+
+            const optionsContainer = document.getElementById('quiz-options');
+            const buttons = optionsContainer.getElementsByTagName('button');
+
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                buttons[i].classList.remove('hover:bg-slate-100');
+
+                if (i === correctIndex) {
+                    buttons[i].classList.add('border-green-500', 'bg-green-100', 'text-green-900');
+                } else if (i === selectedIndex) {
+                    buttons[i].classList.add('border-red-500', 'bg-red-100', 'text-red-900');
+                }
+            }
+
+            const isCorrect = (selectedIndex === correctIndex);
+
+            if (isCorrect) {
+                playSound('correct');
+                gameState.score += 4;
+            } else {
+                playSound('wrong');
+            }
+
+            gameState.answers[currentActiveFlowerIdx] = {
+                questionId: currentActiveFlowerIdx + 1,
+                isCorrect: isCorrect
+            };
+
+            gameState.flowersCollected++;
+            updateHUD();
+
+            document.getElementById('explanation-text').innerText = explanationText;
+            document.getElementById('quiz-explanation').classList.remove('hidden');
+
+            const nextBtn = document.getElementById('btn-next-quiz');
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        function closeQuizAndContinue() {
+            document.getElementById('modal-quiz').classList.add('hidden');
+            gameState.isPaused = false;
+
+            if (gameState.flowersCollected >= 30) {
+                showFinalReport('PETUALANGAN SELESAI');
+            }
+        }
+
+        function gameOver() {
+            gameState.isPaused = true;
+            document.getElementById('modal-quiz').classList.add('hidden');
+            clearInterval(quizTimerInterval);
+            showFinalReport('GAME OVER');
+        }
+
+        function showFinalReport(statusType) {
+            gameState.isPaused = true;
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-report').classList.remove('hidden');
+
+            const badge = document.getElementById('report-status-badge');
+            const title = document.getElementById('report-main-title');
+
+            if (statusType === 'GAME OVER') {
+                badge.innerText = 'GAME OVER';
+                badge.className = 'pixel-font text-xs bg-red-600 text-white px-3 py-1 rounded-full uppercase';
+                title.innerText = 'MARIO KEHABISAN NYAWA!';
+                title.className = 'pixel-font text-2xl sm:text-3xl text-red-600 mt-2';
+            } else {
+                badge.innerText = 'PETUALANGAN SELESAI';
+                badge.className = 'pixel-font text-xs bg-green-500 text-white px-3 py-1 rounded-full uppercase';
+                title.innerText = 'PETUALANGAN SUKSES!';
+                title.className = 'pixel-font text-2xl sm:text-3xl text-green-600 mt-2';
+            }
+
+            const correctCount = gameState.answers.filter(a => a && a.isCorrect).length;
+            const answeredCount = gameState.answers.filter(a => a !== undefined).length;
+            const wrongCount = answeredCount - correctCount;
+            const unansweredCount = 30 - answeredCount;
+            const finalScore = gameState.score;
+
+            document.getElementById('report-name').innerText = playerIdentity.name || '---';
+            document.getElementById('report-absen').innerText = playerIdentity.absen || '---';
+            document.getElementById('report-kelas').innerText = playerIdentity.kelas || '---';
+
+            document.getElementById('report-score').innerText = finalScore;
+            document.getElementById('report-correct').innerText = correctCount;
+            document.getElementById('report-wrong').innerText = wrongCount;
+            document.getElementById('report-unanswered').innerText = unansweredCount;
+
+            const mTitle = document.getElementById('motivation-title');
+            const mText = document.getElementById('motivation-text');
+            const mIcon = document.getElementById('motivation-icon');
+
+            if (statusType === 'GAME OVER') {
+                mIcon.innerText = '⚠️';
+                mTitle.innerText = 'Saran Evaluasi Pembelajaran:';
+                mText.innerText = `Halo ${playerIdentity.name}! Mario kehabisan nyawa sebelum menyelesaikan seluruh bunga. Namun kamu sudah mengumpulkan ${correctCount} jawaban benar (${finalScore} poin). Gunakan tombol tembak bola api untuk menghancurkan kuman dari jauh!`;
+            } else {
+                mIcon.innerText = '🎉';
+                mTitle.innerText = 'Pujian Prestasi:';
+                mText.innerText = `Luar biasa ${playerIdentity.name}! Kamu berhasil melintasi seluruh rintangan dan menyelesaikan 30 soal Teks Narasi Fantasi dengan skor ${finalScore}! Pertahankan prestasimu!`;
+            }
+
+            document.getElementById('power-status-text').innerText = gameState.hasShootingPower ? "Super Mario (Tembak Bola Api 🔥)" : "Mario Kecil";
+            document.getElementById('flower-status-text').innerText = `${gameState.flowersCollected}/30 Bunga`;
+            document.getElementById('lives-status-text').innerText = `${Math.max(0, gameState.lives)}/5 ❤️`;
+        }
+
+        function resetGame() {
+            gameState.lives = 5;
+            gameState.score = 0;
+            gameState.flowersCollected = 0;
+            gameState.isBig = true;
+            gameState.hasShootingPower = true;
+            gameState.answers = [];
+
+            document.getElementById('screen-report').classList.add('hidden');
+            document.getElementById('screen-start').classList.remove('hidden');
+        }
+
+        window.onload = function() {
+            gameLoop();
+        };
+    </script>
+</body>
+</html>
